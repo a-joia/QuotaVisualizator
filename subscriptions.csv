@@ -1,4 +1,4 @@
-SubscriptionId,RequestId,CurrentQuota,NewQuota,RequestCreationDate,Region
+SubscriptionId,RequestId,CurrentQuota,NewQuota,RequestCreationTimeStamp,Region
 1,101,50,70,2024-01-01,US
 1,102,70,80,2024-02-01,US
 1,103,80,90,2024-03-01,EU

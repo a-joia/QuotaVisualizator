@@ -11,14 +11,14 @@ import io
 # Initialize the Dash app
 app = dash.Dash(__name__)
 
-# Normalize the RequestCreationDate and calculate the accumulated difference
+# Normalize the RequestCreationTimeStamp and calculate the accumulated difference
 def normalize_dates_and_calculate_accumulation(df):
     df = df.copy()
-    df['RequestCreationDate'] = pd.to_datetime(df['RequestCreationDate'])
-    df['DaysFromLatest'] = df.groupby('SubscriptionId')['RequestCreationDate'].transform(lambda x: (x.max() - x).dt.days)
+    df['RequestCreationTimeStamp'] = pd.to_datetime(df['RequestCreationTimeStamp'])
+    df['DaysFromLatest'] = df.groupby('SubscriptionId')['RequestCreationTimeStamp'].transform(lambda x: (x.max() - x).dt.days)
     df['QuotaDifference'] = df['NewQuota'] - df['CurrentQuota']
     df['AccumulatedQuotaDifference'] = df.groupby('SubscriptionId')['QuotaDifference'].cumsum()
-    df['NormalizedDate'] = df.groupby('SubscriptionId')['RequestCreationDate'].transform(lambda x: (x - x.min()).dt.days)
+    df['NormalizedDate'] = df.groupby('SubscriptionId')['RequestCreationTimeStamp'].transform(lambda x: (x - x.min()).dt.days)
     return df
 
 def parse_contents(contents, filename):
