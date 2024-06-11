@@ -103,7 +103,9 @@ app.layout = html.Div([
         dcc.Graph(id='aggregated-bar-plot', style={'margin': '20px auto', 'width': '90%'}),
         dcc.Graph(id='normalized-accumulated-quota-plot', style={'margin': '20px auto', 'width': '90%'}),
     ], style={'margin': '50px auto', 'width': '90%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
-    html.Div(id='column-aggregator-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'})
+    html.Div(id='extra-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
+    html.Div(id='column-aggregator-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
+    html.Div(id='additional-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'})
 ], style={'fontFamily': 'Arial, sans-serif', 'backgroundColor': '#f4f4f9', 'padding': '20px'})
 
 @app.callback(
@@ -159,7 +161,9 @@ def set_comparison_options(selected_subscription, similarities_contents, similar
      Output('main-datatable', 'columns'),
      Output('comparison-datatable', 'data'),
      Output('comparison-datatable', 'columns'),
-     Output('column-aggregator-info', 'children')],
+     Output('extra-info', 'children'),
+     Output('column-aggregator-info', 'children'),
+     Output('additional-info', 'children')],
     [Input('subscription-dropdown', 'value'),
      Input('comparison-dropdown', 'value')],
     [State('upload-subscriptions', 'contents'),
@@ -184,9 +188,16 @@ def update_outputs(selected_subscription, comparison_subscriptions, subscription
         main_data = main_df.to_dict('records')
         main_columns = [{"name": i, "id": i} for i in main_df.columns]
 
+        # Prepare ExtraInfo for the selected subscription
+        extra_info = html.Div([
+            html.H4(f"Extra Information for {selected_subscription}", style={'textAlign': 'center', 'color': '#4A90E2'}),
+            html.Ul([html.Li(str(info)) for info in similarity_data[selected_subscription]['ExtraInfo']])
+        ], style={'padding': '20px', 'border': '1px solid #ddd', 'borderRadius': '5px', 'backgroundColor': '#f9f9f9', 'marginBottom': '20px'})
+
         # Filter and plot comparison DataFrame
         similarity_text = ""
         column_aggregator_info = []
+        additional_info = []
         if comparison_subscriptions:
             comparison_df = df[df['SubscriptionId'].isin([int(sub_id) for sub_id in comparison_subscriptions])]
             comparison_df_normalized = df_normalized[df_normalized['SubscriptionId'].isin([int(sub_id) for sub_id in comparison_subscriptions])]
@@ -207,6 +218,12 @@ def update_outputs(selected_subscription, comparison_subscriptions, subscription
                     html.Div([
                         html.H4(f"Column Aggregator for {sub_id}", style={'textAlign': 'center', 'color': '#4A90E2'}),
                         html.Ul([html.Li(str(aggregator)) for aggregator in similarity_data[selected_subscription]['ColumnAggregator'][idx]])
+                    ], style={'padding': '20px', 'border': '1px solid #ddd', 'borderRadius': '5px', 'backgroundColor': '#f9f9f9', 'marginBottom': '20px'})
+                )
+                additional_info.append(
+                    html.Div([
+                        html.H4(f"Additional Information for {sub_id}", style={'textAlign': 'center', 'color': '#4A90E2'}),
+                        html.Ul([html.Li(str(info)) for info in similarity_data[selected_subscription]['AdditionalInformation'][idx]])
                     ], style={'padding': '20px', 'border': '1px solid #ddd', 'borderRadius': '5px', 'backgroundColor': '#f9f9f9', 'marginBottom': '20px'})
                 )
 
@@ -351,8 +368,8 @@ def update_outputs(selected_subscription, comparison_subscriptions, subscription
             # Create the normalized accumulated quota plot for only the selected subscription
             normalized_accumulated_quota_plot = px.line(main_df_normalized, x='NormalizedDate', y='AccumulatedQuotaDifference', title='Accumulated Quota Difference by Normalized Request Creation Date')
 
-        return similarity_text, aggregated_bar_plot, normalized_accumulated_quota_plot, main_data, main_columns, comparison_data, comparison_columns, column_aggregator_info
-    return "", {}, {}, [], [], [], [], ""
+        return similarity_text, aggregated_bar_plot, normalized_accumulated_quota_plot, main_data, main_columns, comparison_data, comparison_columns, extra_info, column_aggregator_info, additional_info
+    return "", {}, {}, [], [], [], [], "", "", ""
 
 # Run the Dash app
 if __name__ == '__main__':
