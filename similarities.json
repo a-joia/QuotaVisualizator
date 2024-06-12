@@ -4,14 +4,16 @@
       "Similarity": [0.8, 0.6],
       "ColumnAggregator":[["zeus"], ["cocacola","abc"]],
       "AdditionalInformation":[["sum2","abd"], ["sum23","avg23"]],
-      "ExtraInfo":["Teste Additinal Info 1"]
+      "ExtraInfo":["Teste Additinal Info 1"],
+      "ClusterId": "2"
     },
     "2": {
       "SimilarSubscriptions": ["1", "3"],
       "Similarity": [0.8, 0.7],
       "ColumnAggregator":[["sum"], ["sum","avg"]],
       "AdditionalInformation":[["sum2"], ["sum2","avg2"]],
-      "ExtraInfo":["Teste Additinal Info 2"]
+      "ExtraInfo":["Teste Additinal Info 2"],
+      "ClusterId": "2"
     }
   }
   

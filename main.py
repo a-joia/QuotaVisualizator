@@ -11,14 +11,17 @@ import io
 # Initialize the Dash app
 app = dash.Dash(__name__)
 
-# Normalize the RequestCreationTimeStamp and calculate the accumulated difference
+# Normalize the RequestCreationDate and calculate the accumulated difference
 def normalize_dates_and_calculate_accumulation(df):
     df = df.copy()
-    df['RequestCreationTimeStamp'] = pd.to_datetime(df['RequestCreationTimeStamp'])
-    df['DaysFromLatest'] = df.groupby('SubscriptionId')['RequestCreationTimeStamp'].transform(lambda x: (x.max() - x).dt.days)
-    df['QuotaDifference'] = df['NewQuota'] - df['CurrentQuota']
-    df['AccumulatedQuotaDifference'] = df.groupby('SubscriptionId')['QuotaDifference'].cumsum()
-    df['NormalizedDate'] = df.groupby('SubscriptionId')['RequestCreationTimeStamp'].transform(lambda x: (x - x.min()).dt.days)
+    if 'RequestCreationDate' in df.columns:
+        df['RequestCreationDate'] = pd.to_datetime(df['RequestCreationDate'])
+        df['DaysFromLatest'] = df.groupby('SubscriptionId')['RequestCreationDate'].transform(lambda x: (x.max() - x).dt.days)
+        df['QuotaDifference'] = df['NewQuota'] - df['CurrentQuota']
+        df['AccumulatedQuotaDifference'] = df.groupby('SubscriptionId')['QuotaDifference'].cumsum()
+        df['NormalizedDate'] = df.groupby('SubscriptionId')['RequestCreationDate'].transform(lambda x: (x - x.min()).dt.days)
+    else:
+        raise KeyError("Column 'RequestCreationDate' not found in DataFrame")
     return df
 
 def parse_contents(contents, filename):
@@ -93,11 +96,17 @@ app.layout = html.Div([
     ], style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
     html.Div([
         html.H3("Selected Subscription Data", style={'textAlign': 'center', 'color': '#4A90E2'}),
-        dash_table.DataTable(id='main-datatable', style_table={'margin': '20px auto', 'width': '90%'}),
+        dash_table.DataTable(
+            id='main-datatable',
+            style_table={'margin': '20px auto', 'width': '100%', 'overflowX': 'scroll'}
+        ),
     ], style={'margin': '50px auto', 'width': '80%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
     html.Div([
         html.H3("Comparison Subscriptions Data", style={'textAlign': 'center', 'color': '#4A90E2'}),
-        dash_table.DataTable(id='comparison-datatable', style_table={'margin': '20px auto', 'width': '90%'}),
+        dash_table.DataTable(
+            id='comparison-datatable',
+            style_table={'margin': '20px auto', 'width': '100%', 'overflowX': 'scroll'}
+        ),
     ], style={'margin': '50px auto', 'width': '80%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
     html.Div([
         dcc.Graph(id='aggregated-bar-plot', style={'margin': '20px auto', 'width': '90%'}),
@@ -105,7 +114,14 @@ app.layout = html.Div([
     ], style={'margin': '50px auto', 'width': '90%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
     html.Div(id='extra-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
     html.Div(id='column-aggregator-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
-    html.Div(id='additional-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'})
+    html.Div(id='additional-info', style={'margin': '50px auto', 'width': '60%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
+    html.Div([
+        html.H3("Cluster Summaries", style={'textAlign': 'center', 'color': '#4A90E2'}),
+        dash_table.DataTable(
+            id='cluster-summary-datatable',
+            style_table={'margin': '20px auto', 'width': '100%', 'overflowX': 'scroll'}
+        ),
+    ], style={'margin': '50px auto', 'width': '80%', 'padding': '20px', 'borderRadius': '10px', 'boxShadow': '0px 0px 10px 0px rgba(0,0,0,0.1)', 'backgroundColor': '#fff'}),
 ], style={'fontFamily': 'Arial, sans-serif', 'backgroundColor': '#f4f4f9', 'padding': '20px'})
 
 @app.callback(
@@ -163,7 +179,9 @@ def set_comparison_options(selected_subscription, similarities_contents, similar
      Output('comparison-datatable', 'columns'),
      Output('extra-info', 'children'),
      Output('column-aggregator-info', 'children'),
-     Output('additional-info', 'children')],
+     Output('additional-info', 'children'),
+     Output('cluster-summary-datatable', 'data'),
+     Output('cluster-summary-datatable', 'columns')],
     [Input('subscription-dropdown', 'value'),
      Input('comparison-dropdown', 'value')],
     [State('upload-subscriptions', 'contents'),
@@ -174,6 +192,9 @@ def set_comparison_options(selected_subscription, similarities_contents, similar
 def update_outputs(selected_subscription, comparison_subscriptions, subscriptions_contents, subscriptions_filename, similarities_contents, similarities_filename):
     if selected_subscription and subscriptions_contents and similarities_contents:
         df = parse_contents(subscriptions_contents, subscriptions_filename)
+        if 'RequestCreationDate' not in df.columns:
+            return "Error: 'RequestCreationDate' column is missing in the uploaded CSV file.", {}, {}, [], [], [], [], "", "", "", [], []
+        
         df_normalized = normalize_dates_and_calculate_accumulation(df)
         similarity_data = parse_contents(similarities_contents, similarities_filename)
 
@@ -368,8 +389,26 @@ def update_outputs(selected_subscription, comparison_subscriptions, subscription
             # Create the normalized accumulated quota plot for only the selected subscription
             normalized_accumulated_quota_plot = px.line(main_df_normalized, x='NormalizedDate', y='AccumulatedQuotaDifference', title='Accumulated Quota Difference by Normalized Request Creation Date')
 
-        return similarity_text, aggregated_bar_plot, normalized_accumulated_quota_plot, main_data, main_columns, comparison_data, comparison_columns, extra_info, column_aggregator_info, additional_info
-    return "", {}, {}, [], [], [], [], "", "", ""
+        # Calculate the cluster summary
+        cluster_summaries = []
+        for sub_id, sub_data in similarity_data.items():
+            cluster_id = sub_data['ClusterId']
+            cluster_df = df[df['SubscriptionId'] == int(sub_id)]
+            cluster_summary = {
+                'ClusterId': cluster_id,
+                'TotalCurrentQuota': cluster_df['CurrentQuota'].sum(),
+                'TotalNewQuota': cluster_df['NewQuota'].sum()
+            }
+            cluster_summaries.append(cluster_summary)
+
+        cluster_summary_df = pd.DataFrame(cluster_summaries).groupby('ClusterId').sum().reset_index()
+
+        # Prepare cluster summary DataTable
+        cluster_summary_data = cluster_summary_df.to_dict('records')
+        cluster_summary_columns = [{"name": i, "id": i} for i in cluster_summary_df.columns]
+
+        return similarity_text, aggregated_bar_plot, normalized_accumulated_quota_plot, main_data, main_columns, comparison_data, comparison_columns, extra_info, column_aggregator_info, additional_info, cluster_summary_data, cluster_summary_columns
+    return "", {}, {}, [], [], [], [], "", "", "", [], []
 
 # Run the Dash app
 if __name__ == '__main__':
