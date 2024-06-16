@@ -1,0 +1,34 @@
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+[LOG] D:\Workspace\Git\QuotaVisualizator\quotaVisualizator 
+service view accessed []
+service view accessed []
+service view accessed []
+service view accessed []
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']
+service view accessed ['id', 'name', 'age', 'city', 'score']

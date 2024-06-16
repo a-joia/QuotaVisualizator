@@ -1,0 +1,83 @@
+/* static/css/style.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.sidebar {
+    background-color: #343a40;
+    min-width: 250px;
+    height: 100vh;
+    padding: 20px;
+    position: fixed;
+}
+
+.sidebar h4 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar .nav-link {
+    color: #adb5bd;
+    margin: 10px 0;
+    transition: color 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+    color: #fff;
+}
+
+.content {
+    margin-left: 270px;
+    padding: 20px;
+}
+
+.table-responsive {
+    max-height: 400px;  /* Adjust the height as needed */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.table thead th {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #343a40;
+    border-color: #343a40;
+}
+
+.btn-primary:hover {
+    background-color: #23272b;
+    border-color: #1d2124;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.btn-disabled {
+    background-color: #d6d6d6;
+    border-color: #d6d6d6;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.btn-enabled {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}

@@ -1,0 +1,28 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div id="loadingMessage" class="text-center" style="display: none;">
+    <img src="{% static 'img/loading.gif' %}" alt="Loading..."  height="300px" width="300px"/>
+</div>
+
+<div id="successMessage" class="text-center" style="display: none;">
+    <h2>Welcome</h2>
+    <!-- <p>Data loaded successfully.</p> -->
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if not loading %}
+            document.getElementById('loadingMessage').style.display = 'block';
+            setTimeout(function() {
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+            }, 2000);  // Simulate a 2 second delay for loading
+        {% else %}
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+        {% endif %}
+    });
+</script>
+{% endblock %}

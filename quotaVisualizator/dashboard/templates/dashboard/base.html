@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="d-flex">
+        <div class="sidebar bg-dark text-white p-3">
+            <h4 class="sidebar-title">Services</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'dashboard:home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'dashboard:service' %}">Graph Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Service 2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Service 3</a>
+                </li>
+            </ul>
+        </div>
+        <div class="content flex-grow-1 p-3">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.
