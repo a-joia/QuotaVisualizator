@@ -1,0 +1,81 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+
+<h1 class="mb-4">Suspicious</h1>
+
+<form id="dataForm" method="POST" enctype="multipart/form-data" class="mb-4">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="columns">Select Columns to Connect:</label>
+        <select id="columns" name="columns" class="form-control select2" multiple="multiple">
+            {% for column in columns %}
+                <option value="{{ column }}" {% if column in selected_columns %}selected{% endif %}>{{ column }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="filter_column">Select Column to Filter:</label>
+        <select id="filter_column" name="filter_column" class="form-control select2">
+            <option value="">Select a column</option>
+            {% for column in columns %}
+                <option value="{{ column }}" {% if column == selected_filter_column %}selected{% endif %}>{{ column }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="filter_value">Filter Value:</label>
+        <select id="filter_value" name="filter_value" class="form-control select2">
+            <option value="">Select a column</option>
+            {% for column in columns %}
+                <option value="{{ column }}" {% if column == selected_filter_column %}selected{% endif %}>{{ column }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<!-- Include jQuery and Select2 CSS and JS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: 'Select columns to display',
+            width: '100%'
+        });
+
+        $('#dataForm').submit(function(event) {
+            $('#loading').show();
+        });
+
+        $('#filter_column').change(function(){
+            var selectedColumn = $(this).val();
+            if(selectedColumn) {
+                $.ajax({
+                    url: "{% url 'get_unique_values' %}",
+                    data: {
+                        'column': selectedColumn
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        var filterValueDropdown = $('#filter_value');
+                        filterValueDropdown.empty();
+                        filterValueDropdown.append('<option value="">Select a value</option>');
+                        $.each(data.unique_values, function(index, value){
+                            filterValueDropdown.append('<option value="'+ value +'">'+ value +'</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#filter_value').empty();
+                $('#filter_value').append('<option value="">Select a value</option>');
+            }
+        });
+    });
+</script>
+{% endblock %}
